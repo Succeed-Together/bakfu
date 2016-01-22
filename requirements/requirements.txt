@@ -1,8 +1,8 @@
-numpy
-scipy
-scikit-learn 
-six>=1.6.1
-nltk
-pattern
-gensim
-git+https://github.com/miotto/treetagger-python.git
+numpy==1.10.1
+scipy==0.16.1
+scikit-learn==0.14.1 
+six==1.10.0
+nltk==3.1
+pattern==2.6
+gensim==0.12.3
+
