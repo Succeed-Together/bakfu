@@ -55,3 +55,6 @@ docs/_build/
 
 #temp files
 *.orig
+
+#bak 
+*~
