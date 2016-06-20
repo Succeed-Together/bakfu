@@ -3,8 +3,8 @@
 Base class for machine supervised classifiers.
 '''
 
-from abc import abstractmethod
 import six
+import numpy as np
 from ...core.classes import Processor
 
 class BaseMl(Processor):
@@ -70,30 +70,34 @@ class BaseMlSk(BaseMl):
         classifier = self._get_classifier()
         vectorizer = caller.get_chain('vectorizer')
 
-        #New data
+        # New data
         data_source = caller.get_chain("data_source")
         new_vectorizer_result = vectorizer.transform(data_source.get_data())
         self.new_vectorizer_result = new_vectorizer_result
-        result = self.classifier.predict(new_vectorizer_result.toarray())
+        result_proba = self.classifier.predict_proba(new_vectorizer_result.toarray())
+        id3MaxProba = np.array([rp.argsort()[-3:][::-1] for rp in result_proba])
+        self.three_best_classes = [[self.classifier.classes_[k] for k in lm] for lm in id3MaxProba]
+        result = [tbc[0] for tbc in self.three_best_classes]
 
         return result
 
     def run(self, caller, *args, **kwargs):
-        super(BaseMlSk, self).run(caller,*args, **kwargs)
+        super(BaseMlSk, self).run(caller, *args, **kwargs)
 
         if self.action in (None, 'fit'):
             result = self.fit(caller, *args, **kwargs)
             self.update(
-                result = result,
-                classifier = result
-                )
+                result=result,
+                classifier=result
+            )
 
         if self.action in (None, 'predict'):
             result = self.predict(caller, *args, **kwargs)
             self.update(
                 result=result,
                 classifier_result=result,
-                new_vectorizer_result=self.new_vectorizer_result
-                )
+                new_vectorizer_result=self.new_vectorizer_result,
+                three_best_classes=self.three_best_classes
+            )
 
         return self
